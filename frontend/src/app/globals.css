@@ -1,26 +1,83 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --onyx: #141414;
+  --onyx-deep: #000000;
+  --paper: #ffffff;
+  --paper-dim: #ececec;
+  --ink: #161616;
+  --line: #d4d4d4;
+  --line-bright: #ffffff;
+  --stamp: #b3261e;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-onyx: var(--onyx);
+  --color-onyx-deep: var(--onyx-deep);
+  --color-paper: var(--paper);
+  --color-paper-dim: var(--paper-dim);
+  --color-ink: var(--ink);
+  --color-line: var(--line);
+  --color-line-bright: var(--line-bright);
+  --color-stamp: var(--stamp);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--onyx);
+  background-image: radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.05), transparent 45%),
+    radial-gradient(circle at 100% 30%, rgba(0, 0, 0, 0.35), transparent 55%);
+  color: var(--paper);
+  font-family: var(--font-body), system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+.ticket {
+  position: relative;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 2px;
+  box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.45);
+}
+
+.ticket-perforation {
+  border-top: 2px dashed rgba(36, 31, 22, 0.25);
+  position: relative;
+}
+
+.ticket-perforation::before,
+.ticket-perforation::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--onyx);
+}
+
+.ticket-perforation::before {
+  left: -8px;
+}
+
+.ticket-perforation::after {
+  right: -8px;
+}
+
+.stamp {
+  font-family: var(--font-display), serif;
+  border: 3px solid var(--stamp);
+  color: var(--stamp);
+  transform: rotate(-6deg);
+  border-radius: 6px;
+  letter-spacing: 0.08em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }

@@ -1,6 +1,26 @@
 import type { Metadata } from "next";
+import { IBM_Plex_Mono, Newsreader, Work_Sans } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/NavBar";
+
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  weight: ["400", "500", "600"],
+  variable: "--font-display",
+});
+
+const workSans = Work_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-body",
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-mono",
+});
 
 export const metadata: Metadata = {
   title: "Reservas B2B para Cadenas de Restaurantes",
@@ -9,10 +29,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
-      <body className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-black dark:text-zinc-50">
+    <html lang="es" className={`${newsreader.variable} ${workSans.variable} ${plexMono.variable}`}>
+      <body>
         <NavBar />
-        <main className="mx-auto max-w-3xl px-6 py-8">{children}</main>
+        <main className="mx-auto max-w-3xl px-6 py-12">{children}</main>
       </body>
     </html>
   );

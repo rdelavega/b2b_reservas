@@ -29,33 +29,37 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto max-w-sm">
-      <h1 className="mb-6 text-xl font-semibold">Iniciar sesión</h1>
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
-        <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="rounded border px-3 py-2"
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="rounded border px-3 py-2"
-        />
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <button
-          type="submit"
-          disabled={cargando}
-          className="rounded bg-zinc-900 px-4 py-2 text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-black"
-        >
-          {cargando ? "Ingresando..." : "Ingresar"}
-        </button>
-      </form>
+      <div className="ticket p-8">
+        <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink/50">Acceso de personal</p>
+        <h1 className="mt-2 font-display text-2xl italic text-ink">Iniciar sesión</h1>
+
+        <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-3">
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="rounded-sm border border-ink/15 bg-paper-dim px-3 py-2.5 text-sm text-ink placeholder:text-ink/40 focus:border-line focus:outline-none"
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="rounded-sm border border-ink/15 bg-paper-dim px-3 py-2.5 text-sm text-ink placeholder:text-ink/40 focus:border-line focus:outline-none"
+          />
+          {error && <p className="font-mono text-xs text-stamp">{error}</p>}
+          <button
+            type="submit"
+            disabled={cargando}
+            className="mt-2 rounded-sm bg-onyx px-4 py-2.5 font-mono text-xs uppercase tracking-widest text-paper transition hover:bg-onyx-deep disabled:opacity-50"
+          >
+            {cargando ? "Ingresando..." : "Ingresar"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

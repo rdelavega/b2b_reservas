@@ -24,23 +24,28 @@ export default function CancelarReservaPage() {
   }
 
   return (
-    <div className="mx-auto max-w-sm flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">Cancelar reserva</h1>
-      <p className="text-zinc-600 dark:text-zinc-400">
-        ¿Confirmas que deseas cancelar esta reserva? Se enviará un correo de aviso.
-      </p>
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      <div className="flex gap-3">
-        <button
-          onClick={confirmarCancelacion}
-          disabled={cancelando}
-          className="rounded bg-red-600 px-4 py-2 text-white disabled:opacity-50"
-        >
-          {cancelando ? "Cancelando..." : "Sí, cancelar"}
-        </button>
-        <button onClick={() => router.back()} className="rounded border px-4 py-2">
-          Volver
-        </button>
+    <div className="mx-auto max-w-sm">
+      <div className="ticket flex flex-col items-center gap-6 p-10 text-center">
+        <div className="stamp px-6 py-2 text-xl font-semibold uppercase">Anular</div>
+        <p className="text-ink/70">
+          ¿Confirmas que deseas cancelar esta reserva? Se enviará un correo de aviso al cliente.
+        </p>
+        {error && <p className="font-mono text-xs text-stamp">{error}</p>}
+        <div className="flex gap-3">
+          <button
+            onClick={confirmarCancelacion}
+            disabled={cancelando}
+            className="rounded-sm bg-stamp px-5 py-2.5 font-mono text-xs uppercase tracking-widest text-paper transition hover:opacity-90 disabled:opacity-50"
+          >
+            {cancelando ? "Anulando..." : "Sí, cancelar"}
+          </button>
+          <button
+            onClick={() => router.back()}
+            className="rounded-sm border border-ink/20 px-5 py-2.5 font-mono text-xs uppercase tracking-widest text-ink transition hover:border-ink/40"
+          >
+            Volver
+          </button>
+        </div>
       </div>
     </div>
   );
