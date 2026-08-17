@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RolUsuario {
+  ADMIN
+  HOST
+  CLIENTE
+}
+
+enum EstadoReserva {
+  PENDIENTE
+  CONFIRMADA
+  CANCELADA
+  COMPLETADA
+}
+
+model Usuario {
+  id           String     @id @default(uuid())
+  nombre       String
+  email        String     @unique
+  passwordHash String
+  rol          RolUsuario
+  sucursal     Sucursal?  @relation(fields: [sucursalId], references: [id])
+  sucursalId   String?
+  reservas     Reserva[]
+  createdAt    DateTime   @default(now())
+
+  @@index([rol])
+}
+
+model Sucursal {
+  id                   String    @id @default(uuid())
+  nombre               String
+  direccion            String
+  horaApertura         String
+  horaCierre           String
+  duracionReservaMin   Int       @default(90)
+  mesas                Mesa[]
+  reservas             Reserva[]
+  hosts                Usuario[]
+  createdAt            DateTime  @default(now())
+}
+
+model Mesa {
+  id         String    @id @default(uuid())
+  sucursal   Sucursal  @relation(fields: [sucursalId], references: [id])
+  sucursalId String
+  numero     Int
+  capacidad  Int
+  reservas   Reserva[]
+
+  @@unique([sucursalId, numero])
+}
+
+model Reserva {
+  id             String        @id @default(uuid())
+  cliente        Usuario       @relation(fields: [clienteId], references: [id])
+  clienteId      String
+  sucursal       Sucursal      @relation(fields: [sucursalId], references: [id])
+  sucursalId     String
+  mesa           Mesa          @relation(fields: [mesaId], references: [id])
+  mesaId         String
+  fecha          DateTime
+  horaInicio     String
+  horaFin        String
+  numPersonas    Int
+  estado         EstadoReserva @default(PENDIENTE)
+  notasEspeciales String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([sucursalId, fecha])
+  @@index([mesaId, fecha])
+}
