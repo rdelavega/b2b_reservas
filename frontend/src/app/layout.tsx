@@ -23,13 +23,21 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Reservas B2B para Cadenas de Restaurantes",
-  description: "Sistema de reservas de mesas para cadenas de restaurantes (Fase 2 - Aplicaciones Web II)",
+  title: "Reservas para restaurantes",
+  description:
+    "Sistema de reservas de mesas para cadenas de restaurantes (Fase 2 - Aplicaciones Web II)",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="es" className={`${newsreader.variable} ${workSans.variable} ${plexMono.variable}`}>
+    <html
+      lang="es"
+      className={`${newsreader.variable} ${workSans.variable} ${plexMono.variable}`}
+    >
       <body>
         <NavBar />
         <main className="mx-auto max-w-3xl px-6 py-12">{children}</main>

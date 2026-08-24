@@ -31,11 +31,15 @@ export default function PerfilPage() {
     <div className="mx-auto max-w-sm">
       <div className="ticket flex flex-col gap-1 p-8">
         <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink/50">
-          Credencial{esDemo ? " · muestra" : ""}
+          Credencial{esDemo ? " · prototipo" : ""}
         </p>
-        <h1 className="mt-1 font-display text-2xl italic text-ink">{usuario.nombre}</h1>
+        <h1 className="mt-1 font-display text-2xl italic text-ink">
+          {usuario.nombre}
+        </h1>
         <div className="ticket-perforation mt-5 pt-5">
-          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink/50">Rol asignado</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink/50">
+            Rol asignado
+          </p>
           <p className="mt-1 inline-block rounded-sm bg-onyx px-3 py-1 font-mono text-xs text-paper">
             {rolLegible[usuario.rol]}
           </p>

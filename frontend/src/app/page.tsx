@@ -4,16 +4,17 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <p className="font-mono text-xs uppercase tracking-[0.3em] text-line">Libro de reservas</p>
+        <p className="font-mono text-xs uppercase tracking-[0.3em] text-line">
+          Lista de reservas
+        </p>
         <h1 className="mt-3 font-display text-4xl italic leading-tight text-paper">
-          Cada mesa, cada hora,
+          Reservas para tu restaurante,
           <br />
-          una comanda a la vez.
+          orden y tranquilidad para tus clientes.
         </h1>
-        <div className="mt-6 h-px w-16 bg-line" />
+        <div className="mt-6 h-px w-24 bg-line" />
         <p className="mt-6 max-w-md text-paper/70">
-          Sistema de reservas para cadenas de restaurantes: cada sucursal administra su
-          disponibilidad, cada anfitrión atiende su turno, cada cliente guarda su lugar.
+          Sistema de reservas para restaurantes
         </p>
       </div>
 
