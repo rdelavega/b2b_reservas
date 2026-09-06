@@ -27,6 +27,18 @@ export const authService = {
     return { id: usuario.id, nombre: usuario.nombre, email: usuario.email, rol: usuario.rol };
   },
 
+  async getProfile(userId: string) {
+    const usuario = await authRepository.findById(userId);
+    if (!usuario) throw new Error("Usuario no encontrado");
+    return {
+      id: usuario.id,
+      nombre: usuario.nombre,
+      email: usuario.email,
+      rol: usuario.rol,
+      sucursalId: usuario.sucursalId,
+    };
+  },
+
   async login(email: string, password: string) {
     const usuario = await authRepository.findByEmail(email);
     if (!usuario) throw new Error("Credenciales inválidas");

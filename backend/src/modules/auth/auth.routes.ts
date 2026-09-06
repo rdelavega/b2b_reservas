@@ -13,4 +13,5 @@ export const authRouter = Router();
 
 authRouter.post("/register", authController.register);
 authRouter.post("/login", loginLimiter, authController.login);
+authRouter.get("/me", requireAuth, authController.me);
 authRouter.patch("/password", requireAuth, authController.changePassword);

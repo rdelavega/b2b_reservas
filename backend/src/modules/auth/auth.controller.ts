@@ -15,6 +15,15 @@ export const authController = {
     }
   },
 
+  async me(req: Request, res: Response) {
+    try {
+      const usuario = await authService.getProfile(req.user!.id);
+      res.json(usuario);
+    } catch (err) {
+      res.status(404).json({ error: (err as Error).message });
+    }
+  },
+
   async login(req: Request, res: Response) {
     const parsed = loginSchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
