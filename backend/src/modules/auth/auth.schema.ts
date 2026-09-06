@@ -5,7 +5,7 @@ export const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
   rol: z.enum(["ADMIN", "HOST", "CLIENTE"]),
-  sucursalId: z.string().uuid().optional(),
+  sucursalId: z.string().min(1).optional(),
 });
 
 export const loginSchema = z.object({

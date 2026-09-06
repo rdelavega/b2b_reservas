@@ -1,9 +1,13 @@
 import { z } from "zod";
 
+// Los IDs son cadenas opacas generadas por Prisma (uuid por defecto) o por el
+// seed; sólo se exige que no estén vacías.
+const id = z.string().min(1);
+
 export const createReservationSchema = z.object({
-  sucursalId: z.string().uuid(),
-  mesaId: z.string().uuid(),
-  clienteId: z.string().uuid().optional(),
+  sucursalId: id,
+  mesaId: id,
+  clienteId: id.optional(),
   fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   horaInicio: z.string().regex(/^\d{2}:\d{2}$/),
   numPersonas: z.number().int().positive(),
@@ -19,7 +23,7 @@ export const updateReservationSchema = z.object({
 });
 
 export const listReservationsQuerySchema = z.object({
-  sucursalId: z.string().uuid().optional(),
-  clienteId: z.string().uuid().optional(),
+  sucursalId: id.optional(),
+  clienteId: id.optional(),
   fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
 });
