@@ -1,16 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authApi } from "@/lib/api";
 import { saveSession } from "@/lib/session";
 
-export default function LoginPage() {
+const inputClass =
+  "rounded-sm border border-ink/15 bg-paper-dim px-3 py-2.5 text-sm text-ink placeholder:text-ink/40 focus:border-line focus:outline-none";
+
+function LoginForm() {
   const router = useRouter();
+  const params = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
+
+  const expirada = params.get("expirada") === "1";
+  const registrado = params.get("registrado") === "1";
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,6 +41,17 @@ export default function LoginPage() {
         <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink/50">Acceso de personal</p>
         <h1 className="mt-2 font-display text-2xl italic text-ink">Iniciar sesión</h1>
 
+        {expirada && (
+          <p className="mt-3 font-mono text-xs text-stamp">
+            Tu sesión expiró. Ingresa de nuevo.
+          </p>
+        )}
+        {registrado && (
+          <p className="mt-3 font-mono text-xs text-onyx">
+            Cuenta creada. Ya puedes iniciar sesión.
+          </p>
+        )}
+
         <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-3">
           <input
             type="email"
@@ -40,7 +59,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="rounded-sm border border-ink/15 bg-paper-dim px-3 py-2.5 text-sm text-ink placeholder:text-ink/40 focus:border-line focus:outline-none"
+            className={inputClass}
           />
           <input
             type="password"
@@ -48,7 +67,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="rounded-sm border border-ink/15 bg-paper-dim px-3 py-2.5 text-sm text-ink placeholder:text-ink/40 focus:border-line focus:outline-none"
+            className={inputClass}
           />
           {error && <p className="font-mono text-xs text-stamp">{error}</p>}
           <button
@@ -59,7 +78,22 @@ export default function LoginPage() {
             {cargando ? "Ingresando..." : "Ingresar"}
           </button>
         </form>
+
+        <p className="mt-4 font-mono text-xs text-ink/50">
+          ¿Sin cuenta?{" "}
+          <Link href="/registro" className="text-onyx underline">
+            Crear una
+          </Link>
+        </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

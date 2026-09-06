@@ -25,7 +25,7 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "Reservas para restaurantes",
   description:
-    "Sistema de reservas de mesas para cadenas de restaurantes (Fase 2 - Aplicaciones Web II)",
+    "Sistema de reservas de mesas para cadenas de restaurantes (Aplicaciones Web II)",
 };
 
 export default function RootLayout({

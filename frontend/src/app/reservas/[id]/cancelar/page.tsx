@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { reservationsApi } from "@/lib/api";
+import { useSession } from "@/lib/useSession";
 
 export default function CancelarReservaPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const { estado: estadoSesion } = useSession();
   const [error, setError] = useState<string | null>(null);
   const [cancelando, setCancelando] = useState(false);
 
@@ -21,6 +23,10 @@ export default function CancelarReservaPage() {
     } finally {
       setCancelando(false);
     }
+  }
+
+  if (estadoSesion !== "autenticado") {
+    return <p className="font-mono text-sm text-paper/50">Cargando...</p>;
   }
 
   return (

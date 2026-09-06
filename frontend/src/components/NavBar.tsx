@@ -1,16 +1,43 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { clearSession, getSession } from "@/lib/session";
+import { useRouter } from "next/navigation";
+import { useSyncExternalStore } from "react";
+import {
+  clearSession,
+  getServerSessionSnapshot,
+  getSessionSnapshot,
+  subscribeSession,
+} from "@/lib/session";
 import { Usuario } from "@/lib/api";
 
-export default function NavBar() {
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
+const ROL_LEGIBLE: Record<Usuario["rol"], string> = {
+  ADMIN: "Admin",
+  HOST: "Host",
+  CLIENTE: "Cliente",
+};
 
-  useEffect(() => {
-    setUsuario(getSession());
-  }, []);
+export default function NavBar() {
+  const router = useRouter();
+  const { usuario } = useSyncExternalStore(
+    subscribeSession,
+    getSessionSnapshot,
+    getServerSessionSnapshot
+  );
+
+  const enlaces: Array<{ href: string; label: string }> = usuario
+    ? [
+        { href: "/reservas", label: "Reservas" },
+        { href: "/reservas/nueva", label: "Nueva" },
+        ...(usuario.rol === "ADMIN" ? [{ href: "/sucursales", label: "Sucursales" }] : []),
+        { href: "/perfil", label: "Perfil" },
+      ]
+    : [];
+
+  function salir() {
+    clearSession();
+    router.push("/login");
+  }
 
   return (
     <nav className="border-b border-line/30 bg-onyx-deep/60">
@@ -19,33 +46,25 @@ export default function NavBar() {
           Reservas
         </Link>
         <div className="flex items-center gap-5 font-mono text-xs uppercase tracking-widest text-paper/70">
-          <Link href="/reservas" className="transition hover:text-line-bright">
-            Reservas
-          </Link>
-          <Link
-            href="/reservas/nueva"
-            className="transition hover:text-line-bright"
-          >
-            Nueva
-          </Link>
-          <Link href="/perfil" className="transition hover:text-line-bright">
-            Perfil
-          </Link>
+          {enlaces.map((e) => (
+            <Link key={e.href} href={e.href} className="transition hover:text-line-bright">
+              {e.label}
+            </Link>
+          ))}
           {usuario ? (
-            <button
-              onClick={() => {
-                clearSession();
-                window.location.href = "/login";
-              }}
-              className="text-stamp transition hover:text-line-bright"
-            >
-              Salir
-            </button>
+            <>
+              <span className="hidden text-line/70 sm:inline">
+                {usuario.nombre.split(" ")[0]} · {ROL_LEGIBLE[usuario.rol]}
+              </span>
+              <button
+                onClick={salir}
+                className="text-stamp transition hover:text-line-bright"
+              >
+                Salir
+              </button>
+            </>
           ) : (
-            <Link
-              href="/login"
-              className="text-line transition hover:text-line-bright"
-            >
+            <Link href="/login" className="text-line transition hover:text-line-bright">
               Ingresar
             </Link>
           )}
