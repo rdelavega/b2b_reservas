@@ -76,4 +76,10 @@ test("un admin da de alta una sucursal y una mesa", async ({ page }) => {
 
   await page.getByRole("button", { name: "Agregar" }).click();
   await expect(page.getByText(/Mesa 1 · /)).toBeVisible();
+
+  // Limpieza: eliminar la sucursal creada por la prueba.
+  page.once("dialog", (d) => d.accept());
+  await page.getByRole("button", { name: "Eliminar" }).click();
+  await page.waitForURL("**/sucursales");
+  await expect(page.getByRole("link", { name: new RegExp(nombre) })).toHaveCount(0);
 });

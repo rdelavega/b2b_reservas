@@ -49,7 +49,7 @@ model Sucursal {
 
 model Mesa {
   id         String    @id @default(uuid())
-  sucursal   Sucursal  @relation(fields: [sucursalId], references: [id])
+  sucursal   Sucursal  @relation(fields: [sucursalId], references: [id], onDelete: Cascade)
   sucursalId String
   numero     Int
   capacidad  Int

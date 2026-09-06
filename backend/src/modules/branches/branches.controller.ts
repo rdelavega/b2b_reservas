@@ -55,12 +55,24 @@ export const branchesController = {
   },
 
   async remove(req: Request, res: Response) {
-    await branchesService.deleteBranch(req.params.id);
-    res.status(204).send();
+    try {
+      await branchesService.deleteBranch(req.params.id);
+      res.status(204).send();
+    } catch {
+      res.status(409).json({
+        error: "No se puede eliminar la sucursal: tiene reservas asociadas",
+      });
+    }
   },
 
   async removeTable(req: Request, res: Response) {
-    await branchesService.removeTable(req.params.mesaId);
-    res.status(204).send();
+    try {
+      await branchesService.removeTable(req.params.mesaId);
+      res.status(204).send();
+    } catch {
+      res.status(409).json({
+        error: "No se puede eliminar la mesa: tiene reservas asociadas",
+      });
+    }
   },
 };
