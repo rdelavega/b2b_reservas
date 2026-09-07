@@ -8,8 +8,18 @@ const prisma = new PrismaClient();
  * Datos de demostración para consumir el frontend (Fase 4).
  * Reejecutable: usa upsert por email / claves naturales.
  */
+const CORREOS_DEMO = ["admin@demo.test", "host@demo.test", "cliente@demo.test"];
+
 async function main() {
   const passwordHash = await bcrypt.hash("clave1234", 10);
+
+  // Deja las cuentas de demostración en un estado limpio y reproducible
+  // (necesario para que las pruebas E2E partan siempre de cero).
+  await prisma.reserva.deleteMany({
+    where: { cliente: { email: { in: CORREOS_DEMO } } },
+  });
+  // Restos de corridas E2E interrumpidas.
+  await prisma.sucursal.deleteMany({ where: { nombre: { startsWith: "Sucursal E2E " } } });
 
   const centro = await prisma.sucursal.upsert({
     where: { id: "seed-sucursal-centro" },

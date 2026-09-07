@@ -19,20 +19,23 @@ async function login(page: Page, cred: { email: string; password: string }) {
 test("un cliente crea, edita y cancela una reserva desde la UI", async ({ page }) => {
   await login(page, CLIENTE);
 
-  // Alta: elegir sucursal, ver disponibilidad y reservar un slot.
+  // Alta: elegir la última mesa/horario disponible (evita colisiones con datos previos).
   await page.goto("/reservas/nueva");
   await page.getByRole("button", { name: "Ver disponibilidad" }).click();
-  const primerSlot = page.locator("button", { hasText: /^\d{2}:\d{2}$/ }).first();
-  await expect(primerSlot).toBeVisible();
-  const hora = (await primerSlot.textContent())?.trim() ?? "";
-  await primerSlot.click();
+  const slots = page.locator("button", { hasText: /^\d{2}:\d{2}$/ });
+  await expect(slots.first()).toBeVisible();
+  const ultimoSlot = slots.last();
+  const hora = (await ultimoSlot.textContent())?.trim() ?? "";
+  await ultimoSlot.click();
   await page.getByRole("button", { name: /Reservar mesa a las/ }).click();
   await page.waitForURL("**/reservas");
 
-  // Lectura: la reserva aparece en el libro con su hora.
-  const fila = page.locator("li.ticket", { hasText: hora }).first();
+  // Lectura: la reserva recién creada aparece PENDIENTE con su hora.
+  const fila = page
+    .locator("li.ticket")
+    .filter({ hasText: hora })
+    .filter({ hasText: "PENDIENTE" });
   await expect(fila).toBeVisible();
-  await expect(fila).toContainText("PENDIENTE");
 
   // Cambio: editar el número de personas.
   await fila.getByRole("link", { name: "Editar" }).click();
@@ -42,16 +45,20 @@ test("un cliente crea, edita y cancela una reserva desde la UI", async ({ page }
   await page.getByRole("button", { name: "Guardar cambios" }).click();
   await page.waitForURL("**/reservas");
 
-  // Baja: cancelar la reserva.
-  const filaEditada = page.locator("li.ticket", { hasText: hora }).first();
-  await filaEditada.getByRole("link", { name: "Cancelar" }).click();
+  // Baja: cancelar esa misma reserva (aún PENDIENTE).
+  await page
+    .locator("li.ticket")
+    .filter({ hasText: hora })
+    .filter({ hasText: "PENDIENTE" })
+    .getByRole("link", { name: "Cancelar" })
+    .click();
   await page.waitForURL("**/cancelar");
   await page.getByRole("button", { name: "Sí, cancelar" }).click();
   await page.waitForURL("**/reservas");
 
   await expect(
-    page.locator("li.ticket", { hasText: hora }).first()
-  ).toContainText("CANCELADA");
+    page.locator("li.ticket").filter({ hasText: hora }).filter({ hasText: "CANCELADA" })
+  ).toBeVisible();
 });
 
 test("sin sesión, /reservas redirige a /login", async ({ page }) => {

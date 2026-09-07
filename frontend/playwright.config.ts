@@ -3,7 +3,7 @@ import { defineConfig, devices } from "@playwright/test";
 /**
  * Pruebas E2E de la integración frontend <-> backend (Fase 4).
  *
- * `webServer` levanta el backend (con seed de datos de demostración) y el
+ * `globalSetup` reseeda la base de datos y `webServer` levanta el backend y el
  * frontend antes de correr las pruebas. Requiere una base PostgreSQL disponible
  * según `backend/.env` (por ejemplo el contenedor `reservas-pg`).
  */
@@ -12,6 +12,7 @@ export default defineConfig({
   timeout: 30_000,
   fullyParallel: false,
   workers: 1,
+  globalSetup: "./playwright.global-setup.ts",
   reporter: [["list"], ["html", { open: "never", outputFolder: "playwright-report" }]],
   use: {
     baseURL: "http://localhost:3100",
@@ -20,7 +21,7 @@ export default defineConfig({
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: [
     {
-      command: "npm run prisma:seed && npm run dev",
+      command: "npm run dev",
       cwd: "../backend",
       env: { PORT: "4100" },
       url: "http://localhost:4100/health",
