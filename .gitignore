@@ -11,3 +11,7 @@ npm-debug.log*
 .DS_Store
 
 backend/generated/
+
+# Informe de Fase 4 generado (no versionar; la fuente es docs/fase-4-desarrollo-frontend.md)
+docs/Fase4-Desarrollo-Frontend.pdf
+docs/fase-4-informe.html
