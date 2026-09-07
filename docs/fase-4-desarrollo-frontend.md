@@ -166,9 +166,10 @@ ok 8 - reservas: alta, consulta, cambio y baja (cancelación)
 
 ### 4.2 Nivel E2E (navegador) — `frontend/e2e/reservas.spec.ts`
 
-Pruebas con **Playwright** que abren un navegador real, levantan backend + frontend
-(con *seed* de datos) mediante `webServer` de Playwright y validan el recorrido del
-usuario a través de la UI.
+Pruebas con **Playwright** que abren un navegador real. Antes de la suite,
+`globalSetup` reseeda la base de datos (estado conocido) y el `webServer` de
+Playwright levanta backend + frontend; las pruebas validan el recorrido del usuario
+a través de la UI.
 
 | Prueba | Qué valida |
 |---|---|

@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Fase 4 - Desarrollo de Frontend</title>
+<style>
+  @page { size: A4; margin: 22mm 20mm; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    color: #1a1a1a;
+    margin: 0;
+  }
+  h1, h2, h3 { line-height: 1.3; color: #0b2e59; }
+  h1 { font-size: 17pt; margin: 0 0 4pt; }
+  h2 { font-size: 14pt; margin: 22pt 0 6pt; border-bottom: 1.5pt solid #0b2e59; padding-bottom: 3pt; }
+  h3 { font-size: 12pt; margin: 14pt 0 4pt; }
+  p { margin: 0 0 8pt; text-align: justify; }
+  ul, ol { margin: 0 0 8pt; padding-left: 20pt; }
+  li { margin-bottom: 3pt; }
+  code, pre { font-family: "Courier New", Courier, monospace; font-size: 10.5pt; }
+  pre {
+    background: #f4f5f7;
+    border: 1pt solid #d0d5dd;
+    border-radius: 3pt;
+    padding: 8pt 10pt;
+    white-space: pre-wrap;
+    line-height: 1.35;
+    margin: 6pt 0 10pt;
+  }
+  code.inl { background: #f0f2f5; padding: 0 3pt; border-radius: 2pt; }
+  table { width: 100%; border-collapse: collapse; margin: 6pt 0 12pt; font-size: 10.5pt; }
+  th, td { border: 1pt solid #c4c9d2; padding: 4pt 6pt; text-align: left; vertical-align: top; }
+  th { background: #0b2e59; color: #fff; }
+  tr:nth-child(even) td { background: #f4f6f9; }
+  .placeholder {
+    border: 1.5pt dashed #9aa4b2;
+    background: #fafbfc;
+    color: #55607a;
+    text-align: center;
+    padding: 26pt 14pt;
+    margin: 8pt 0 14pt;
+    border-radius: 4pt;
+    font-style: italic;
+  }
+  .placeholder strong { display: block; font-style: normal; color: #0b2e59; margin-bottom: 4pt; }
+  .cover {
+    height: calc(297mm - 44mm);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .cover .shield {
+    width: 120pt; height: 120pt; margin: 0 auto 24pt;
+    border: 1.5pt dashed #9aa4b2; border-radius: 6pt;
+    display: flex; align-items: center; justify-content: center;
+    color: #55607a; font-style: italic; font-size: 10pt; padding: 8pt;
+  }
+  .cover h1 { font-size: 22pt; margin-bottom: 6pt; }
+  .cover .sub { font-size: 13pt; color: #333; margin-bottom: 40pt; }
+  .cover .meta { font-size: 12pt; line-height: 1.9; }
+  .cover .meta .f { color: #55607a; }
+  .note { background: #eef4ff; border-left: 3pt solid #0b2e59; padding: 6pt 10pt; margin: 8pt 0 12pt; }
+  .section { page-break-inside: avoid; }
+  footer { margin-top: 26pt; font-size: 9.5pt; color: #667; border-top: 1pt solid #c4c9d2; padding-top: 6pt; }
+</style>
+</head>
+<body>
+
+<!-- ===================== PORTADA ===================== -->
+<div class="cover">
+  <div class="shield">[ Insertar escudo EBC ]</div>
+  <h1>Aplicación Web CRUD &mdash; Sistema de Reservas B2B</h1>
+  <div class="sub">Fase 4 &mdash; Desarrollo de Frontend<br>(Unidad 5)</div>
+  <div class="meta">
+    <div><span class="f">Asignatura:</span> Aplicaciones Web II</div>
+    <div><span class="f">Docente / Asesor:</span> ________________________</div>
+    <div><span class="f">Integrante(s):</span> ________________________</div>
+    <div><span class="f">Fecha de entrega:</span> ____ / ____ / ________</div>
+  </div>
+</div>
+
+<!-- ===================== 1. RESUMEN ===================== -->
+<div class="section">
+<h1>Informe de avance &mdash; Fase 4</h1>
+<h2>1. Resumen</h2>
+<p>
+  En la Fase&nbsp;3 el backend quedó operando la funcionalidad completa de manipulación de datos
+  (autenticación, sucursales, mesas y reservas) sobre una base de datos PostgreSQL, con acceso a
+  datos mediante el ORM Prisma y sus servicios listos para ser consumidos. La Fase&nbsp;4 construye
+  el <strong>entramado de frontend</strong> que consume esos servicios por HTTP, de modo que un
+  usuario real ejecuta el ciclo CRUD completo (Altas, Bajas, Cambios y Consultas) desde la interfaz,
+  y añade <strong>pruebas de humo</strong> que verifican la integración entre frontend y backend de
+  extremo a extremo.
+</p>
+<p>
+  El frontend es una aplicación <strong>Next.js&nbsp;16 (App Router) + React&nbsp;19 + Tailwind
+  CSS&nbsp;4</strong>. Toda la comunicación con el backend se centraliza en un único cliente HTTP
+  (<code class="inl">frontend/src/lib/api.ts</code>) y la sesión se gestiona con un token JWT
+  almacenado en el navegador.
+</p>
+</div>
+
+<!-- ===================== 2. ENTRAMADO FRONTEND ===================== -->
+<h2>2. Entramado de frontend y consumo de servicios</h2>
+
+<h3>2.1 Arquitectura de consumo</h3>
+<pre>Navegador
+  |
+  |-- Componentes de página (app/**/page.tsx)      ("use client")
+  |        llaman a
+  |        v
+  |-- Cliente API  (lib/api.ts)
+  |        fetch() con  Authorization: Bearer &lt;JWT&gt;
+  |        - inyecta el token desde localStorage
+  |        - normaliza los errores en ApiError { mensaje, status }
+  |        - ante 401 (token ausente / expirado): limpia la sesión y va a /login
+  |        v
+  |-- Backend Express  (http://localhost:4000)
+         /auth      /branches      /reservations</pre>
+
+<table>
+  <tr><th>Elemento</th><th>Responsabilidad</th></tr>
+  <tr><td><code class="inl">lib/session.ts</code></td><td>Store de sesión (token + usuario) sobre <code class="inl">localStorage</code>, expuesto a React con <code class="inl">useSyncExternalStore</code>; se sincroniza entre pestañas con el evento <code class="inl">storage</code>.</td></tr>
+  <tr><td><code class="inl">lib/useSession.ts</code></td><td>Hook de guarda: expone <code class="inl">{ usuario, estado }</code> y redirige a <code class="inl">/login</code> si no hay sesión, o a <code class="inl">/reservas</code> si el rol no está autorizado.</td></tr>
+  <tr><td><code class="inl">components/NavBar.tsx</code></td><td>Navegación reactiva: muestra nombre y rol, y sólo los enlaces permitidos (p.&nbsp;ej. <em>Sucursales</em> únicamente para el rol ADMIN).</td></tr>
+  <tr><td><code class="inl">lib/api.ts</code> (intercepción 401)</td><td>Si el backend responde 401, se limpia la sesión y se fuerza el regreso a <code class="inl">/login?expirada=1</code>.</td></tr>
+</table>
+
+<h3>2.2 Mapa de pantalla &rarr; servicio de backend</h3>
+<table>
+  <tr><th>Pantalla (ruta)</th><th>Acción del usuario</th><th>Método <code>lib/api.ts</code></th><th>Endpoint backend</th></tr>
+  <tr><td>/registro</td><td>Alta de cuenta</td><td>authApi.register</td><td>POST /auth/register</td></tr>
+  <tr><td>/login</td><td>Inicio de sesión</td><td>authApi.login</td><td>POST /auth/login</td></tr>
+  <tr><td>/perfil</td><td>Ver identidad</td><td>authApi.me</td><td>GET /auth/me</td></tr>
+  <tr><td>/perfil</td><td>Cambiar contraseña</td><td>authApi.changePassword</td><td>PATCH /auth/password</td></tr>
+  <tr><td>/reservas</td><td>Consulta (Leer)</td><td>reservationsApi.list</td><td>GET /reservations</td></tr>
+  <tr><td>/reservas</td><td>Confirmar reserva</td><td>reservationsApi.confirm</td><td>PATCH /reservations/:id</td></tr>
+  <tr><td>/reservas/nueva</td><td>Listar sucursales</td><td>branchesApi.list</td><td>GET /branches</td></tr>
+  <tr><td>/reservas/nueva</td><td>Consultar disponibilidad</td><td>branchesApi.availability</td><td>GET /branches/:id/availability</td></tr>
+  <tr><td>/reservas/nueva</td><td>Alta de reserva (Crear)</td><td>reservationsApi.create</td><td>POST /reservations</td></tr>
+  <tr><td>/reservas/:id/editar</td><td>Cargar reserva</td><td>reservationsApi.getOne</td><td>GET /reservations/:id</td></tr>
+  <tr><td>/reservas/:id/editar</td><td>Cambio (Actualizar)</td><td>reservationsApi.update</td><td>PATCH /reservations/:id</td></tr>
+  <tr><td>/reservas/:id/cancelar</td><td>Baja (borrado lógico)</td><td>reservationsApi.cancel</td><td>DELETE /reservations/:id</td></tr>
+  <tr><td>/sucursales</td><td>Consulta / Alta de sucursal</td><td>branchesApi.list / create</td><td>GET / POST /branches</td></tr>
+  <tr><td>/sucursales/:id</td><td>Detalle / Cambio / Baja</td><td>branchesApi.getOne / update / remove</td><td>GET / PATCH / DELETE /branches/:id</td></tr>
+  <tr><td>/sucursales/:id</td><td>Alta / Baja de mesa</td><td>branchesApi.addMesa / removeMesa</td><td>POST / DELETE /branches/:id/mesas</td></tr>
+</table>
+<p>
+  Con esto quedan cubiertas en la interfaz las cuatro operaciones del CRUD sobre las dos entidades
+  de negocio: <strong>reservas</strong> y <strong>sucursales / mesas</strong>.
+</p>
+
+<h3>2.3 Ajustes de backend para el consumo</h3>
+<ol>
+  <li><strong>GET /auth/me</strong> &mdash; devuelve <code class="inl">{ id, nombre, email, rol, sucursalId }</code> a partir del token; sustituye la lectura de datos cacheados en el navegador.</li>
+  <li><strong>Reservas con relaciones</strong> &mdash; el repositorio incluye <code class="inl">sucursal</code> y <code class="inl">mesa</code> en las respuestas, para mostrar &laquo;Sucursal Centro &middot; Mesa 3&raquo; en lugar de identificadores.</li>
+  <li><strong>Esquemas de validación</strong> &mdash; los identificadores pasan de <code class="inl">uuid()</code> a &laquo;cadena no vacía&raquo;, admitiendo tanto los UUID generados por Prisma como los IDs legibles del <em>seed</em> de demostración.</li>
+  <li><strong>Borrado en cascada</strong> &mdash; al eliminar una sucursal se eliminan sus mesas; una sucursal con reservas asociadas sigue protegida y devuelve un error 409 con mensaje claro.</li>
+</ol>
+
+<!-- ===================== 3. REST vs WEBSOCKETS ===================== -->
+<h2>3. Justificación: REST y no WebSockets</h2>
+<p>
+  Los lineamientos piden justificar el empleo de <em>websockets</em> en caso de utilizarlos.
+  <strong>Este proyecto no los utiliza</strong>; toda la comunicación es <strong>HTTP/REST de tipo
+  petición&ndash;respuesta</strong>. Las razones son:
+</p>
+<ul>
+  <li>Las operaciones son <strong>transaccionales y las inicia el usuario</strong> (crear, editar o cancelar una reserva; administrar sucursales). No hay un flujo continuo de datos que justifique una conexión persistente.</li>
+  <li><strong>No hay colaboración en tiempo real</strong> entre varios usuarios sobre el mismo recurso ni necesidad de <em>push</em> del servidor al cliente. La disponibilidad de mesas se consulta <strong>bajo demanda</strong> al abrir la pantalla de nueva reserva.</li>
+  <li>REST sobre HTTP es <strong>más simple de operar, cachear, depurar y escalar</strong> (el servidor no mantiene estado de conexión) y encaja con el modelo CRUD del proyecto.</li>
+  <li>Las notificaciones al cliente (confirmación, cancelación, reprogramación) se resuelven por <strong>correo electrónico</strong> desde el backend, no por un canal en vivo.</li>
+</ul>
+<p>
+  Si en el futuro se requiriera un tablero de ocupación de mesas actualizado al instante para el
+  <em>host</em>, entonces sí se evaluaría WebSockets o <em>Server-Sent Events</em> para esa vista concreta.
+</p>
+
+<!-- ===================== 4. PRUEBAS DE HUMO ===================== -->
+<h2>4. Pruebas de humo de la integración frontend &harr; backend</h2>
+<p>
+  Se implementaron <strong>dos niveles</strong> de prueba de humo, ambos ejecutados contra el backend
+  y la base de datos reales.
+</p>
+
+<h3>4.1 Nivel API &mdash; <code>backend/src/tests/http-smoke.test.ts</code></h3>
+<p>
+  Levanta la aplicación Express en un puerto efímero y ejercita <strong>por HTTP</strong> los mismos
+  endpoints, y en el mismo orden, que consume <code class="inl">frontend/src/lib/api.ts</code>. Es la
+  evidencia de que &laquo;los servicios están listos para ser consumidos por el frontend&raquo;:
+  registro &rarr; login &rarr; <code class="inl">/auth/me</code> &rarr; alta de sucursal y mesa &rarr;
+  disponibilidad &rarr; alta / consulta / cambio / confirmación / baja de reserva &rarr; cambio de
+  contraseña &rarr; bloqueo sin token.
+</p>
+<p><strong>Comando:</strong></p>
+<pre>cd backend
+npm test                 # Fase 3 (servicios/ORM) + Fase 4 (integración HTTP)
+npm run test:integration # sólo la prueba de integración frontend&harr;backend</pre>
+<p><strong>Resultado obtenido:</strong></p>
+<pre>ok 1 - salud del backend
+ok 2 - auth: registro, login y perfil (/auth/me)
+ok 3 - sucursales: alta de sucursal y mesa, listado y disponibilidad
+ok 4 - reservas: alta, consulta con relaciones, cambio, confirmación y baja
+ok 5 - auth: cambio de contraseña y bloqueo sin token
+ok 6 - auth: registro, login y cambio de contraseña
+ok 7 - sucursales: alta, consulta, cambio y disponibilidad
+ok 8 - reservas: alta, consulta, cambio y baja (cancelación)
+1..8
+# tests 8
+# pass 8
+# fail 0</pre>
+<div class="placeholder">
+  <strong>[ CAPTURA 1 ]</strong>
+  Terminal ejecutando <code>npm test</code> en la carpeta <code>backend</code>, mostrando las 8 pruebas en verde (<code># pass 8 / # fail 0</code>).
+</div>
+
+<h3>4.2 Nivel E2E (navegador) &mdash; <code>frontend/e2e/reservas.spec.ts</code></h3>
+<p>
+  Pruebas con <strong>Playwright</strong> que abren un navegador real y validan el recorrido del
+  usuario a través de la interfaz. Antes de la suite, <code class="inl">globalSetup</code> reseeda la
+  base de datos (estado conocido) y el <code class="inl">webServer</code> de Playwright levanta el
+  backend y el frontend.
+</p>
+<table>
+  <tr><th>Prueba</th><th>Qué valida</th></tr>
+  <tr><td>Un cliente crea, edita y cancela una reserva desde la UI</td><td>CRUD completo de reserva desde el navegador: selección de sucursal, consulta de disponibilidad, alta, verificación en el libro, cambio de personas y cancelación (estado CANCELADA).</td></tr>
+  <tr><td>Sin sesión, /reservas redirige a /login</td><td>La guarda de sesión del frontend funciona.</td></tr>
+  <tr><td>Un admin da de alta una sucursal y una mesa</td><td>CRUD de sucursales / mesas desde la UI con rol ADMIN.</td></tr>
+</table>
+<p><strong>Comando</strong> (requiere PostgreSQL disponible, p.&nbsp;ej. el contenedor <code class="inl">reservas-pg</code>):</p>
+<pre>cd frontend
+npx playwright install chromium   # sólo la primera vez
+npm run test:e2e</pre>
+<p><strong>Resultado obtenido:</strong></p>
+<pre>Running 3 tests using 1 worker
+
+  ok  1  un cliente crea, edita y cancela una reserva desde la UI (2.4s)
+  ok  2  sin sesión, /reservas redirige a /login (0.3s)
+  ok  3  un admin da de alta una sucursal y una mesa (1.3s)
+
+  3 passed (8.2s)</pre>
+<div class="placeholder">
+  <strong>[ CAPTURA 2 ]</strong>
+  Terminal ejecutando <code>npm run test:e2e</code> en la carpeta <code>frontend</code>, mostrando las 3 pruebas E2E en verde (<code>3 passed</code>).
+</div>
+<div class="placeholder">
+  <strong>[ CAPTURA 3 &mdash; opcional ]</strong>
+  Reporte HTML de Playwright (<code>npx playwright show-report</code>) con las 3 pruebas pasando.
+</div>
+
+<!-- ===================== 5. GUÍA PARA GENERAR LAS CAPTURAS ===================== -->
+<h2>5. Guía para reproducir el entorno y generar las capturas</h2>
+
+<h3>5.1 Base de datos (PostgreSQL vía Docker)</h3>
+<pre>docker run -d --name reservas-pg \
+  -e POSTGRES_USER=usuario -e POSTGRES_PASSWORD=password -e POSTGRES_DB=reservas_b2b \
+  -p 5432:5432 postgres:16-alpine</pre>
+
+<h3>5.2 Backend</h3>
+<pre>cd backend
+cp .env.example .env
+npm install
+npx prisma migrate deploy     # aplica el esquema
+npm run prisma:seed           # datos de demostración
+npm run dev                   # queda en http://localhost:4000</pre>
+<p>Usuarios de demostración (contraseña <code class="inl">clave1234</code>):</p>
+<table>
+  <tr><th>Correo</th><th>Rol</th></tr>
+  <tr><td>admin@demo.test</td><td>ADMIN</td></tr>
+  <tr><td>host@demo.test</td><td>HOST (Sucursal Centro)</td></tr>
+  <tr><td>cliente@demo.test</td><td>CLIENTE</td></tr>
+</table>
+
+<h3>5.3 Frontend</h3>
+<pre>cd frontend
+cp .env.local.example .env.local     # NEXT_PUBLIC_API_URL=http://localhost:4000
+npm install
+npm run dev                          # queda en http://localhost:3000</pre>
+
+<h3>5.4 Secuencia sugerida para las capturas del Anexo</h3>
+<ol>
+  <li>Abrir <code class="inl">http://localhost:3000</code> &rarr; capturar la pantalla de inicio.</li>
+  <li>Ir a <strong>/login</strong>, entrar como <code class="inl">cliente@demo.test</code> &rarr; capturar el formulario.</li>
+  <li>Ir a <strong>/reservas/nueva</strong>, elegir sucursal, pulsar &laquo;Ver disponibilidad&raquo;, elegir un horario &rarr; capturar la grilla de slots.</li>
+  <li>Pulsar &laquo;Reservar&raquo; &rarr; en <strong>/reservas</strong> capturar el libro con la reserva PENDIENTE (muestra sucursal y mesa).</li>
+  <li>Entrar a <strong>/perfil</strong> &rarr; capturar identidad real (desde <code class="inl">/auth/me</code>) y el formulario de cambio de contraseña.</li>
+  <li>Cerrar sesión, entrar como <code class="inl">admin@demo.test</code>, ir a <strong>/sucursales</strong> &rarr; capturar el listado y el formulario de alta.</li>
+  <li>Abrir el detalle de una sucursal &rarr; capturar la edición y la gestión de mesas.</li>
+</ol>
+
+<!-- ===================== 6. ANEXO CAPTURAS ===================== -->
+<h2>6. Anexo &mdash; Capturas del frontend en funcionamiento</h2>
+
+<div class="placeholder"><strong>[ CAPTURA A ]</strong> Pantalla de inicio de sesión (<code>/login</code>).</div>
+<div class="placeholder"><strong>[ CAPTURA B ]</strong> Nueva reserva con disponibilidad por horarios (<code>/reservas/nueva</code>).</div>
+<div class="placeholder"><strong>[ CAPTURA C ]</strong> Libro de reservas con estado, sucursal y mesa (<code>/reservas</code>).</div>
+<div class="placeholder"><strong>[ CAPTURA D ]</strong> Edición de una reserva (<code>/reservas/:id/editar</code>).</div>
+<div class="placeholder"><strong>[ CAPTURA E ]</strong> Cancelación de una reserva (<code>/reservas/:id/cancelar</code>).</div>
+<div class="placeholder"><strong>[ CAPTURA F ]</strong> Perfil de usuario y cambio de contraseña (<code>/perfil</code>).</div>
+<div class="placeholder"><strong>[ CAPTURA G ]</strong> Administración de sucursales &mdash; listado y alta (<code>/sucursales</code>).</div>
+<div class="placeholder"><strong>[ CAPTURA H ]</strong> Detalle de sucursal &mdash; edición, baja y gestión de mesas (<code>/sucursales/:id</code>).</div>
+
+<!-- ===================== 7. REPOSITORIO ===================== -->
+<h2>7. Repositorio</h2>
+<p>
+  El avance está integrado en el repositorio de control de versiones:
+  <code class="inl">github.com/rdelavega/b2b_reservas</code>, rama <code class="inl">main</code>.
+</p>
+<table>
+  <tr><th>Commit</th><th>Contenido</th></tr>
+  <tr><td>Fase 4: soporte backend para consumo de frontend</td><td>GET /auth/me; reservas con sucursal y mesa; seed de datos.</td></tr>
+  <tr><td>Fase 4: entramado frontend consumiendo el backend</td><td>Cliente API, sesión y guardas, NavBar, pantallas /registro y /sucursales, rediseño de /reservas/nueva, /perfil real, retiro del modo demo.</td></tr>
+  <tr><td>Fase 4: pruebas de humo de integración frontend-backend</td><td>Prueba HTTP + pruebas E2E de Playwright.</td></tr>
+  <tr><td>Fase 4: documento ejecutivo y README</td><td>Este documento y actualización del README.</td></tr>
+  <tr><td>Fase 4: borrado de sucursal en cascada sobre mesas</td><td>Migración y manejo de error 409.</td></tr>
+</table>
+
+<h2>8. Entregables de la fase (lista de verificación)</h2>
+<ul>
+  <li>[x] Entramado frontend con solicitudes a backend integradas.</li>
+  <li>[x] CRUD completo consumible desde la interfaz (reservas y sucursales / mesas).</li>
+  <li>[x] Pruebas de humo de la integración frontend &harr; backend (API + E2E) con resultados.</li>
+  <li>[x] Documento ejecutivo con la justificación de REST.</li>
+  <li>[x] Avance integrado en el repositorio (rama <code class="inl">main</code>).</li>
+</ul>
+
+<footer>
+  Aplicaciones Web II &mdash; Fase 4 (Desarrollo de Frontend). Documento de avance. Formato: Arial 12, interlineado 1.5.
+</footer>
+
+</body>
+</html>
