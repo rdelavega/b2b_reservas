@@ -1,0 +1,24 @@
+# Blueprint de Render para el backend (Node/Express/Prisma).
+# La base de datos PostgreSQL se aprovisiona aparte, en Neon (ver docs/entrega-del-proyecto.md).
+# Uso: en Render, "New +" -> "Blueprint" -> selecciona este repo.
+services:
+  - type: web
+    name: reservas-b2b-backend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npm run start:prod
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: DATABASE_URL
+        sync: false # cadena de conexión de Neon
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 15m
+      - key: FRONTEND_URL
+        sync: false # URL del frontend en Vercel, para restringir CORS

@@ -12,6 +12,14 @@ npm-debug.log*
 
 backend/generated/
 
-# Informe de Fase 4 generado (no versionar; la fuente es docs/fase-4-desarrollo-frontend.md)
+# Informes/PDFs generados para entregar a la escuela: no se versionan.
+# Las fuentes de contenido (los .md correspondientes) sí se versionan.
 docs/Fase4-Desarrollo-Frontend.pdf
 docs/fase-4-informe.html
+docs/Entrega-del-Proyecto.pdf
+docs/entrega-del-proyecto.html
+docs/Manual-de-Usuario.pdf
+docs/manual-de-usuario.html
+docs/manual-assets/
+docs/Presentacion-Ejecutiva.pdf
+docs/presentacion-ejecutiva.html
