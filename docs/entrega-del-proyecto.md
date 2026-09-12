@@ -63,14 +63,26 @@ cd frontend && npm run test:e2e        # 3 E2E
 
 | Componente | Liga |
 |---|---|
-| Frontend (Vercel) | _pendiente de completar tras el despliegue_ |
-| Backend (Render) | _pendiente de completar tras el despliegue_ |
+| Frontend (Vercel) | https://b2b-reservas.vercel.app |
+| Backend (Render) | https://reservas-b2b-backend.onrender.com |
+
+Verificado en producción (2026-09-12): `GET /health` responde `{"status":"ok"}`, CORS
+correctamente restringido al origen del frontend, y un recorrido completo de usuario
+(login → alta de reserva → aparece en el libro → cancelación) contra Vercel + Render +
+Neon reales, sin errores de consola.
+
+Usuarios de demostración ya sembrados en la base productiva (contraseña `clave1234`):
+`admin@demo.test`, `host@demo.test`, `cliente@demo.test`.
+
+*Nota:* el backend está en el plan gratuito de Render, que suspende el servicio tras
+inactividad; la primera solicitud después de un rato sin uso puede tardar ~30-60s en
+responder mientras "despierta" (arranque en frío).
 
 ## 4. Checklist de entregables
 
 - [x] Proceso de aseguramiento de calidad, con resultados.
 - [x] Proceso de liberación (estrategia, go-live, mantenimiento).
-- [ ] Liga en ambiente productivo (pendiente del despliegue real).
+- [x] Liga en ambiente productivo, verificada extremo a extremo.
 - [x] Repositorio integrado (`github.com/rdelavega/b2b_reservas`, rama `main`).
 - [x] Manual de usuario (`Manual-de-Usuario.pdf`, local).
 - [x] Presentación ejecutiva con speech de venta (`Presentacion-Ejecutiva.pdf`, local).
