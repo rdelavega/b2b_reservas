@@ -1,14 +1,7 @@
 import { reservationsRepository } from "./reservations.repository";
 import { notificationsService } from "../notifications/notifications.service";
 import { AuthPayload } from "../../middlewares/auth.middleware";
-
-function sumarMinutos(hora: string, minutos: number): string {
-  const [h, m] = hora.split(":").map(Number);
-  const total = h * 60 + m + minutos;
-  const hh = Math.floor(total / 60).toString().padStart(2, "0");
-  const mm = (total % 60).toString().padStart(2, "0");
-  return `${hh}:${mm}`;
-}
+import { sumarMinutos } from "../../lib/time";
 
 export const reservationsService = {
   async create(
